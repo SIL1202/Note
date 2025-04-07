@@ -4,7 +4,7 @@
 using namespace std;
 
 void swap(int &, int &);
-void quickSort(vector<int> &, int, int, int);
+void quickSort(vector<int> &, int, int);
 int quick_partition(vector<int> &, int, int);
 
 int main() {
@@ -14,7 +14,7 @@ int main() {
   for (int i = 0; i < n; i++)
     arr[i] = n - i;
 
-  quickSort(arr, 0, arr.size() - 1, 0);
+  quickSort(arr, 0, arr.size() - 1);
 
   for (int i = 0; i < arr.size(); i++)
     cout << arr[i] << " ";
@@ -28,7 +28,7 @@ void swap(int &a, int &b) {
 }
 
 // QuickSort
-void quickSort(vector<int> &array, int low, int high, int depth) {
+void quickSort(vector<int> &array, int low, int high) {
   if (low >= high) {
     return;
   }
@@ -38,8 +38,8 @@ void quickSort(vector<int> &array, int low, int high, int depth) {
   // 記錄當前範圍內的數組、pivot 位置、遞迴深度
   vector<int> temp(array.begin() + low, array.begin() + high + 1);
 
-  quickSort(array, low, pivot - 1, depth + 1);
-  quickSort(array, pivot + 1, high, depth + 1);
+  quickSort(array, low, pivot - 1);
+  quickSort(array, pivot + 1, high);
 }
 
 // Partition
