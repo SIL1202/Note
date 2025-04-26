@@ -66,3 +66,16 @@ drwxr-xr-x@  7 sil  staff    224  4 12 10:34 ShellScript
 drwxr-xr-x@  8 sil  staff    256  3  8 14:42 sil.github.io
 drwxr-xr-x@  9 sil  staff    288  4 12 10:34 UVA
 ```
+```
+ls -R     // Recursively list subdirectories encountered
+
+➜  File_Management git:(main) ✗ ls -R parent
+f1 f2 f3
+
+parent/f1:
+
+parent/f2:
+
+parent/f3:
+```
+
