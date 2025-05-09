@@ -15,8 +15,10 @@
 ## 模板流程：固定動作
 
 1. 對全部數字排序 (由小到大)
+
 2. 設 `coinSum = 1`
-3. 循環每個 a[i] :
+
+   循環每個 a[i] :
    - 如果 a[i] 小於等於 coinSum，把 a[i] 加入 coinSum
    - 如果 a[i] 大於 coinSum，表示沒路接，答案就是 coinSum
 
