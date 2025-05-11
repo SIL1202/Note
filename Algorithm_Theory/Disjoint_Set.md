@@ -54,13 +54,20 @@
 2. **Union by Rank / Size**：合併時讓小集合掛到大集合，降低樹高
 
    ```cpp
-   void UnoinSet(int x, int y){
-     int rootX = find(x);
-     int rootY = find(y);
-     if(rootX != rootY){
-       root[rootY] = rootX;
+   void unionSet(int x, int y) {
+       int rootX = find(x);
+       int rootY = find(y);
+       if (rootX != rootY) {
+         if (rank[rootX] > rank[rootY])
+           root[rootY] = rootX;
+         else if (rank[rootX] < rank[rootY])
+           root[rootX] = rootY;
+         else {
+           root[rootY] = rootX;
+           rank[rootX]++;
+         }
+       }
      }
-   }
    ```
 
 
@@ -84,31 +91,43 @@ using namespace std;
 
 class UnionFind {
 public:
-  UnionFind(int sz) : root(sz) {
-    for (int i = 0; i < sz; i++) root[i] = i;
+  // 建構函式：初始化 root 和 rank 陣列
+  UnionFind(int sz) : root(sz), rank(sz) {
+    for (int i = 0; i < sz; i++) {
+      root[i] = i;   // 每個節點初始為自己的根
+      rank[i] = 1;   // 每棵樹初始高度為 1
+    }
   }
 
+  // find：尋找 x 的根節點，並路徑壓縮
   int find(int x) {
-    return root[x];  // 無優化版本
+    if (root[x] == x)
+      return x;
+    return root[x] = find(root[x]);  // 路徑壓縮：直接連到根節點
   }
 
+  // unionSet：合併 x 與 y 的集合（用 rank 判斷樹高）
   void unionSet(int x, int y) {
     int rootX = find(x);
     int rootY = find(y);
-    if (rootX != rootY) { 
-      for (int i = 0; i < root.size(); i++) { // 無優化版本
-        if (root[i] == rootY)
-          root[i] = rootX;
+    if (rootX != rootY) {
+      if (rank[rootX] > rank[rootY])      // x 的樹比較高，y 接到 x
+        root[rootY] = rootX;
+      else if (rank[rootX] < rank[rootY]) // y 的樹比較高，x 接到 y
+        root[rootX] = rootY;
+      else {                              // 高度相等，隨便接並更新高度
+        root[rootY] = rootX;
+        rank[rootX]++;
       }
     }
   }
 
-  bool connected(int x, int y) {
-    return find(x) == find(y);
-  }
+  // 檢查兩節點是否屬於同一集合
+  bool connected(int x, int y) { return find(x) == find(y); }
 
 private:
-  vector<int> root;
+  vector<int> root; // 紀錄每個節點的父節點
+  vector<int> rank; // 紀錄每個集合樹的高度
 };
 ```
 
@@ -147,25 +166,24 @@ int main() {
 - 最差情況下：節點可能需要查找多層父節點
 - 加入路徑壓縮後：幾乎所有節點都會直接連接到根節點
 
-### ⚡ 總體複雜度
+### ⚡ 總體複雜度比較
 
-對於 `n` 筆操作，整體時間複雜度為：
+| 優化方式                | `find`/`union` 單次時間複雜度 |
+| ----------------------- | ----------------------------- |
+| 無優化                  | O(n)                          |
+| 只有 Rank               | O(log n)                      |
+| Path Compression        | 接近 O(log n)                 |
+| Rank + Path Compression | **O(α(n)) ≈ O(1)**            |
 
-$O(α(n))$
+### 📌 說明：
 
-其中 α(n) 是反阿克曼函數，增長極慢：
+- 若只用 rank（不含壓縮），最壞情況樹高為 $log⁡n$，所以 `find` 為 $O(log⁡n)$
+- 若加入路徑壓縮，則整體摺疊效率變高，複雜度下降為 $O(α(n))$
+- $α(n)$ 是反阿克曼函數，成長極慢，在實務中可視為常數時間
 
-- $α(1)=1$
-- $α(10)=2$
-- $α(2^{2^{16}}) = 5$
+$α(1)=1,\ α(10)=2,\ α(2^{2^{16}})=5$
 
-➡️ 所以實務上可視為 **近乎 O(1)** 的操作
-
-| 操作類型     | 無優化 | 有 Path Compression |
-| ------------ | ------ | ------------------- |
-| `find(x)`    | O(n)   | O(α(n)) ≈ O(1)      |
-| `union(x,y)` | O(n)   | O(α(n)) ≈ O(1)      |
-| 總體操作     | O(n²)  | O(n·α(n))           |
+➡️ 因此 Path Compression + Rank 是最理想的優化組合。
 
 ------
 
