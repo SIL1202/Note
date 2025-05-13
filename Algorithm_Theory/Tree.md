@@ -7,7 +7,26 @@
 ### ✅ 無向圖的樹定義：
 
 1. 連通（Connected）
+
 2. 無環（Acyclic）
+
+   > 有環的話回傳 true
+
+   ```cpp
+   bool dfs(int v, int par){
+     vis[v] = true;
+     for(int u: adj[v]){
+       if(!vis[u] && dfs(u, v)) 
+         return true;
+       if(u != par)
+         return true;
+     }
+     return false;
+   }
+   ```
+
+   
+
 3. 對於 n 個節點，一定有 n - 1 條邊
 
 ➡ 若上述三個條件成立，則為一棵樹。
@@ -81,6 +100,48 @@ int main() {
 ```
 
 ---
+
+### 📘 範例：NeetCode - Graph Valid Tree
+
+* **題目簡述**：給一個無向圖，判斷其是否為一棵樹。
+
+* **解題思路**：確認連通性、邊數為 n - 1。
+
+* **完整程式碼**：
+
+  ```cpp
+  class Solution {
+  public:
+      // check if there is only one component
+      bool validTree(int n, vector<vector<int>>& edges) {
+          vector<bool> vis(n, false);
+          vector<vector<int>> adj(n);
+  
+          for(vector<int> &e: edges){
+              adj[e[0]].push_back(e[1]);
+              adj[e[1]].push_back(e[0]);
+          }
+  
+          function<bool(int, int)> dfs = [&](int u, int par) -> bool {
+              vis[u] = true;
+              for(int v: adj[u]){                
+                  if (v == par) continue;
+                  if (vis[v] || !dfs(v, u)) return false;     // 發現 back edge ⇒ cycle
+             }
+              return true;
+          };
+  
+          if(!dfs(0, -1)) return false;
+          for(bool v: vis)
+              if(!v) return false;
+          return true;
+      }
+  };
+  ```
+
+  
+
+------
 
 ## 三、有向圖判斷是否為樹（Rooted Tree）
 
