@@ -137,3 +137,130 @@ int main() {
 }
 ```
 
+---
+
+## 七、例題整理
+
+### 範例一：SPOJ - BUGLIFE
+
+- **題目連結**：[BUGLIFE](https://www.spoj.com/problems/BUGLIFE/)
+- **題意簡述**：判斷是否能將昆蟲分為兩類，避免同性別有衝突的關係。
+- **解題思路**：建圖後檢查是否為 bipartite。使用 DFS 進行染色。
+- **完整程式碼**：
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+const int MAX = 2001;
+vector<int> adj[MAX];
+vector<int> color;
+
+bool bi_dfs(int v, int c) {
+  color[v] = c;
+  for (int node : adj[v]) {
+    if (color[node] == -1) {
+      if (!bi_dfs(node, c ^ 1))
+        return false;
+    } else if (color[node] == c)
+      return false;
+  }
+  return true;
+}
+
+int main() {
+  int t;
+  cin >> t;
+
+  for (int i = 1; i <= t; i++) {
+    int n, m;
+    cin >> n >> m;
+    color.assign(n + 1, -1); // can't not use resize, because resize won't replace old values
+    for (int j = 1; j <= n; j++)
+      adj[j].clear();
+
+    for (int j = 0; j < m; j++) {
+      int a, b;
+      cin >> a >> b;
+      adj[a].push_back(b);
+      adj[b].push_back(a);
+    }
+
+    bool res = true;
+    for (int j = 1; j <= n; j++) {
+      if (color[j] == -1)    // check connected component
+        if (!bi_dfs(j, 0)) { // check bipartite graph
+          res = false;
+          break;
+        }
+    }
+
+    cout << "Scenario #" << i << ":\n";
+    if (res)
+      cout << "No suspicious bugs found!\n";
+    else
+      cout << "Suspicious bugs found!\n";
+  }
+  return 0;
+}
+```
+
+### 範例二：CSES - Building Teams
+
+- **題目連結**：[Building Teams](https://cses.fi/problemset/task/1668/)
+- **題意簡述**：有 `n` 個學生與 `m` 對敵對關係，請判斷是否能將學生分成兩隊，且同一隊內不能有敵人。
+- **解題思路**：將每個學生視為圖的節點，敵對關係視為邊，檢查整張圖是否為 bipartite，若是則輸出每位學生的隊伍（1 或 2），否則輸出 `IMPOSSIBLE`。
+- **完整程式碼**：
+
+```cpp
+#include <functional>
+#include <iostream>
+#include <vector>
+using namespace std;
+
+const int MAX = 1e5 + 5;
+
+int main() {
+  int n, m;
+  cin >> n >> m;
+  vector<int> adj[MAX];
+  vector<int> col(n + 1, -1);
+
+  for (int i = 0; i < m; i++) {
+    int a, b;
+    cin >> a >> b;
+    adj[a].push_back(b);
+    adj[b].push_back(a);
+  }
+
+  function<bool(int, int)> dfs = [&](int v, int c) -> bool {
+    col[v] = c;
+    for (int node : adj[v]) {
+      if (col[node] == -1) {
+        if (!dfs(node, c ^ 1))
+          return false;
+      } else if (col[node] == c)
+        return false;
+    }
+    return true;
+  };
+
+  bool res = true;
+  for (int i = 1; i <= n; i++) {
+    if (col[i] == -1)
+      if (!dfs(i, 0)) {
+        res = false;
+        break;
+      }
+  }
+
+  if (!res)
+    cout << "IMPOSSIBLE\n";
+  else
+    for (int i = 1; i <= n; i++)
+      cout << col[i] + 1 << ' ';
+
+  return 0;
+}
+```
