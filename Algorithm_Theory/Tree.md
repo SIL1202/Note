@@ -162,4 +162,4 @@ bool isDirectedTree(const vector<vector<int>>& adj, int n) {
 
 * **Leetcode 261. [Graph Valid Tree](https://leetcode.com/problems/graph-valid-tree/description/)** (可到 [NeetCode](https://neetcode.io/problems/valid-tree) 練習)
 * **CSES - [Company Queries 系列](https://cses.fi/problemset/task/1687)**（進階有向樹處理）
-
+* **HackRank - [Is It A Tree?](https://www.hackerrank.com/contests/code-a-thon/challenges/is-it-a-tree/problem)**  (進階有向樹處理)
