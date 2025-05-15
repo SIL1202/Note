@@ -320,6 +320,47 @@ int main() {
 - 使用 DSU 將所有節點合併（注意 id 可能不連續）
 - 最後統計每個 root 的元件大小，取其中大小 ≥ 2 的 min 和 max
 
+**程式邏輯：**
+
+```cpp
+vector<int> componentsInGraph(vector<vector<int>> gb) {
+    int maxNode = 0;                                                      // 用來找出節點編號的最大值（因為不是連續的）
+    for (auto &e : gb)                                                    // 遍歷每條邊
+        maxNode = max({maxNode, e[0], e[1]});                              // 更新最大節點編號
+
+    vector<int> parent(maxNode + 1), size(maxNode + 1, 1);                // 初始化 parent 和 size 陣列，點編號從 1 到 maxNode
+    iota(parent.begin(), parent.end(), 0);                                // parent[i] = i，讓每個節點初始各自為一個集合
+
+    function<int(int)> find = [&](int x) {                                // DSU 的 find 函式（含 path compression）
+        return parent[x] == x ? x : parent[x] = find(parent[x]);         // 找出 x 的 root，同時壓縮路徑
+    };
+
+    auto unite = [&](int a, int b) {                                      // DSU 的 unite 函式（含 union by size）
+        int ra = find(a), rb = find(b);                                   // 找出 a 和 b 各自的 root
+        if (ra == rb) return;                                             // 如果已經在同一個集合就跳過
+        if (size[ra] < size[rb]) swap(ra, rb);                            // 確保 ra 的集合比較大
+        parent[rb] = ra;                                                  // 把 rb 接到 ra
+        size[ra] += size[rb];                                             // 更新合併後的集合大小
+    };
+
+    for (auto &e : gb) {                                                  // 遍歷所有邊
+        int a = e[0], b = e[1];                                           // 取出兩個端點
+        unite(a, b);                                                      // 合併這兩個點
+    }
+
+    vector<int> result;                                                   // 用來存儲所有大小 >= 2 的 component size
+    for (int i = 1; i <= maxNode; i++) {                                  // 遍歷所有點（1 到 maxNode）
+        if (parent[i] == i && size[i] > 1)                                // 如果 i 是 root，且元件大小 > 1
+            result.push_back(size[i]);                                    // 加入這個元件的大小
+    }
+
+    sort(result.begin(), result.end());                                   // 排序後方便取得 min/max
+    return {result.front(), result.back()};                               // 回傳最小與最大元件大小（題目只要這兩個值）
+}
+```
+
+
+
 ------
 
 ## 🧠 補充觀念
@@ -336,7 +377,16 @@ int main() {
   if (a == b) return;
   ```
 
-- 如果想維護 rank 但不追 size：可以用 `rank[]` 實作 union by rank
+  
+
+- 找出正確的陣列大小（**點數 != 邊數**）：
+
+  ```
+  int maxNode = 0;
+  for (auto &e : gb) maxNode = max({maxNode, e[0], e[1]});
+  ```
+
+  
 
 ------
 
@@ -345,5 +395,5 @@ int main() {
 | 題目                  | 平台       | 類型         | 關鍵技巧                     |
 | --------------------- | ---------- | ------------ | ---------------------------- |
 | Road Construction     | CSES       | 動態連通性   | DSU + size + component count |
-| Components in a Graph | Hackerrank | 基礎合併統計 | DSU + map root size          |
+| Components in a Graph | Hackerrank | 基礎合併統計 | DSU +  root size             |
 
