@@ -54,23 +54,62 @@
 2. **Union by Rank / Size**：合併時讓小集合掛到大集合，降低樹高
 
    ```cpp
+   // Rank 按照樹高
    void unionSet(int x, int y) {
-       int rootX = find(x);
-       int rootY = find(y);
-       if (rootX != rootY) {
-         if (rank[rootX] > rank[rootY])
-           root[rootY] = rootX;
-         else if (rank[rootX] < rank[rootY])
-           root[rootX] = rootY;
-         else {
-           root[rootY] = rootX;
-           rank[rootX]++;
-         }
+     int rootX = find(x);
+     int rootY = find(y);
+     if (rootX != rootY) {
+       if (rank[rootX] > rank[rootY])
+         root[rootY] = rootX;
+       else if (rank[rootX] < rank[rootY])
+         root[rootX] = rootY;
+       else {
+         root[rootY] = rootX;
+         rank[rootX]++;
        }
      }
+   }
+   
+   // 或可以簡寫成以下形式
+   void unionSet(int x, int y) {
+     int rootX = find(x);
+     int rootY = find(y);
+     if (rootX == rootY) return; // 已經在同一個集合，直接返回
+   
+     // 確保 rootX 是較大的樹（如果 rank 相同，則無所謂）
+     if (rank[rootX] < rank[rootY]) {
+       swap(rootX, rootY);
+     }
+   
+     // 合併較小的樹 (rootY) 到較大的樹 (rootX)
+     root[rootY] = rootX;
+   
+     // 如果兩棵樹 rank 相同，則增加 rootX 的 rank
+     if (rank[rootX] == rank[rootY]) {
+       rank[rootX]++;
+     }
+   }
    ```
 
+   ```cpp
+   // Size 按照 component size
+   void unionSet(int x, int y) {
+     int rootX = find(x);
+     int rootY = find(y);
+     if (rootX == rootY) return;  // 已在同一集合，直接返回
+   
+     // 確保 rootX 是較大的集合
+     if (size[rootX] < size[rootY]) {
+       swap(rootX, rootY);
+     }
+   
+     // 合併較小的集合 (rootY) 到較大的集合 (rootX)
+     root[rootY] = rootX;
+     size[rootX] += size[rootY];  // 更新集合大小
+   }
+   ```
 
+   
 
 ---
 
