@@ -1,4 +1,4 @@
-## 字串匹配：暴力法 vs KMP 演算法
+# 字串匹配：暴力法 vs KMP 演算法 （簡潔版）
 
 ---
 
@@ -7,7 +7,7 @@
 
 ---
 
-### 🔨 暴力法：時間複雜度 O(n * m)
+## 🔨 暴力法：時間複雜度 O(n * m)
 
 ```cpp
 void BruteForceMatch(string text, string pattern) {
@@ -31,7 +31,7 @@ void BruteForceMatch(string text, string pattern) {
 
 ---
 
-### ⚡ KMP 演算法：時間複雜度 O(n + m)
+## ⚡ KMP 演算法：時間複雜度 O(n + m)
 
 #### 🔧 Step 1：建立 LPS 表（Longest Prefix Suffix）
 
@@ -91,7 +91,46 @@ void KMP(string text, string pattern) {
 
 ---
 
-### 🧪 測試程式：
+## **✨ 精簡版 KMP：一行內處理條件與計數**
+
+```cpp
+void KMP_Concise(string s, string p) {
+  int n = s.length();
+  int m = p.length();
+
+  // 建立 lps 表
+  vector<int> lps(m);
+  for (int i = 1, j = 0; i < m;) {
+    if (p[i] == p[j])
+      lps[i++] = ++j;
+    else if (j != 0)
+      j = lps[j - 1];
+    else
+      lps[i++] = 0;
+  }
+
+  // 進行比對
+  int count = 0;
+  for (int i = 0, j = 0; i < n;) {
+    if (s[i] == p[j])
+      ++i, ++j;
+    if (j == m)
+      ++count, j = lps[j - 1];  // 匹配成功，更新 j 繼續找
+    else if (i < n && s[i] != p[j])
+      j ? j = lps[j - 1] : ++i; // 失敗但 j ≠ 0 就跳位，否則 i++
+  }
+  cout << "Count from concise version: " << count << '\n';
+}
+```
+
+📌 **說明**：
+
+- 簡化整體流程，將跳位與成功條件整合在迴圈內。
+- 若只關心出現次數，可使用 count 變數統計。
+
+---
+
+## 🧪 測試程式：
 
 ```cpp
 int main() {
