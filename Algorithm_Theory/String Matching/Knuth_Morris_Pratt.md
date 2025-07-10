@@ -129,6 +129,37 @@ void KMP_Concise(string s, string p) {
 
 ---
 
+## ✨檢查是否出現
+
+```cpp
+bool KMP_Match(string s, string p) {
+  int n = s.length();
+  int m = p.length();
+
+  // build LPS table
+  vector<int> lps(m);
+  for (int i = 1, j = 0; i < m;) {
+    if (p[i] == p[j])
+      lps[i++] = ++j;
+    else
+      j ? j = lps[j - 1] : lps[i++] = 0;
+  }
+
+	// match
+  for (int i = 0, j = 0; i < n;) {
+    if (s[i] == p[j]){
+      ++i, ++j;
+      if (j == m)
+        return true; // if match return true and stop.
+    } else if (i < n && s[i] != p[j])
+      j ? j = lps[j - 1] : ++i;
+  }
+  return false;
+}
+```
+
+---
+
 ## 🧪 測試程式：
 
 ```cpp
