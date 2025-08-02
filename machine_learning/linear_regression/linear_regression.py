@@ -10,7 +10,7 @@ class LinearRegression:
         self.weight, self.bias, loss_history = training(
             sepal_length, sepal_width, self.weight, self.bias, lr, iters
         )
-        return loss_history[-1]  # 回傳最後一次 loss（也可以改成 loss_history）
+        return loss_history
 
 
 def loss_function(sepal_length, sepal_width, weight, bias):
