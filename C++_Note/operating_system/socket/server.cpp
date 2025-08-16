@@ -13,7 +13,7 @@ int main() {
   sockaddr_in addr{};
   addr.sin_family = AF_INET;
   addr.sin_port = htons(8080);
-  addr.sin_addr.s_addr = htonl(INADDR_ANY); // 綁在 0.0.0.0:8080
+  addr.sin_addr.s_addr = htonl(INADDR_ANY);
   bind(s, (struct sockaddr *)&addr, sizeof(addr));
 
   listen(s, 5);
