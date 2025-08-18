@@ -2,6 +2,7 @@
 // It accepts a client connection and receives data from the client,
 // printing each complete line received. The server handles partial lines
 // and ensures that any remaining data is printed when the client disconnects.
+
 #include <arpa/inet.h>
 #include <cstdlib>
 #include <netinet/in.h>

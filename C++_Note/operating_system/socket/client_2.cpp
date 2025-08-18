@@ -8,6 +8,7 @@
 // 客戶端可以持續讀取標準輸入（stdin），並將每行資料發送到
 // server_2。這個程式會確保每行資料都完整發送，即使資料超過了緩衝區大小。每行結尾會自動添加換行符號
 // '\n'，並且在發送過程中處理了可能的 socket 錯誤。
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
