@@ -65,7 +65,6 @@ int main() {
     }
   }
 
-  // stdin EOF（Ctrl-D）後關閉 socket，通知 server
   close(s);
   return 0;
 }
