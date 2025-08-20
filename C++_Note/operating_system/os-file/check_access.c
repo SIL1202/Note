@@ -1,3 +1,5 @@
+// This program checks if a file exists and prints its access permissions and
+// owner name
 #include <pwd.h>
 #include <stdio.h>
 #include <sys/stat.h>

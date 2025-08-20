@@ -1,3 +1,6 @@
+// This program retrieves and displays information about a file specified by the
+// user. It shows the file size, owner UID and GID, owner's name, group's name,
+// and the file's permissions in a human-readable format.
 #include <grp.h>
 #include <pwd.h>
 #include <stdio.h>

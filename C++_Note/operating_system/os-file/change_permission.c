@@ -1,3 +1,8 @@
+// This program changes the file permissions of a specified file to a given
+// octal value. It takes two command line arguments: the file path and the octal
+// permission value. It uses the `chmod` system call to change the file
+// permissions and prints a success message if the operation is successful, or
+// an error message if it fails.
 #include <stdio.h>
 #include <sys/stat.h>
 

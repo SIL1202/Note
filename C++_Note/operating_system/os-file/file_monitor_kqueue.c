@@ -1,3 +1,8 @@
+// File: file_monitor_kqueue.c
+// Description: 使用 kqueue 監控檔案變化的程式
+// Author: Your Name
+// Date: YYYY-MM-DD
+// This program monitors a file for changes using kqueue on BSD-like systems.
 #include <fcntl.h> // open(), O_EVTONLY
 #include <stdio.h>
 #include <sys/event.h>
