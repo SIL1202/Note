@@ -1,12 +1,18 @@
+// Compile with: gcc -o server server.c
+// This is a simple server that provides an "add" service.
+// It listens on a random port, registers itself with a registry running on
+// localhost at port// 8888, and processes incoming requests to add two numbers.
 #include <arpa/inet.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#define BUFSZ 256
 #define REG_PORT 8888
-long func(const long a, const long b) { return a * b; }
+#define BUFSZ 256
+
+long add(long a, long b) { return a + b; }
 
 int main() {
   // (a) 綁 0 由 OS 配一個臨時埠
@@ -15,22 +21,13 @@ int main() {
   a.sin_family = AF_INET;
   a.sin_addr.s_addr = htonl(INADDR_ANY);
   a.sin_port = htons(0);
-  if (bind(srv, (struct sockaddr *)&a, sizeof(a)) < 0) {
-    perror("bind");
-    exit(1);
-  }
-  if (listen(srv, 8) < 0) {
-    perror("listen");
-    exit(1);
-  }
+  bind(srv, (struct sockaddr *)&a, sizeof(a));
+  listen(srv, 16);
 
-  // Get the port number assigned by the OS
+  // 取得實際埠號
   socklen_t len = sizeof(a);
+  getsockname(srv, (struct sockaddr *)&a, &len);
   int port = ntohs(a.sin_port);
-  if (getsockname(srv, (struct sockaddr *)&a, &len) < 0) {
-    perror("getsockname");
-    exit(1);
-  }
   printf("service 'add' on port %d\n", port);
 
   // (b) 向 registry 註冊
@@ -39,31 +36,26 @@ int main() {
   ra.sin_family = AF_INET;
   ra.sin_port = htons(REG_PORT);
   inet_pton(AF_INET, "127.0.0.1", &ra.sin_addr);
+  connect(r, (struct sockaddr *)&ra, sizeof(ra));
+  dprintf(r, "REGISTER add %d\n", port);
+  char tmp[BUFSZ] = {0};
+  read(r, tmp, sizeof(tmp));
+  close(r);
 
+  // (c) 服務 loop：協定 "ADD a b\n" → 回 "RESULT x\n"
   for (;;) {
-    int cli = accept(srv, NULL, NULL);
-    if (cli < 0) {
-      perror("accept");
+    int c = accept(srv, NULL, NULL);
+    if (c < 0)
       continue;
-    }
-
     char buf[BUFSZ] = {0};
-    ssize_t n = recv(cli, buf, sizeof(buf) - 1, 0);
-    if (n <= 0) {
-      close(cli);
-      continue;
+    ssize_t n = recv(c, buf, sizeof(buf) - 1, 0);
+    if (n > 0) {
+      long x, y;
+      if (sscanf(buf, "ADD %ld %ld", &x, &y) == 2)
+        dprintf(c, "RESULT %ld\n", add(x, y));
+      else
+        dprintf(c, "ERROR\n");
     }
-
-    long a, b;
-    if (sscanf(buf, "ADD %ld %ld", &a, &b) == 2) {
-      char out[64];
-      snprintf(out, sizeof(out), "RESULT %ld\n", func(a, b));
-      send(cli, out, strlen(out), 0);
-    } else {
-      const char *err = "ERROR bad_request\n";
-      send(cli, err, strlen(err), 0);
-    }
-    close(cli);
+    close(c);
   }
-  return 0;
 }
